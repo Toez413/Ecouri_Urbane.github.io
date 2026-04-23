@@ -1,0 +1,831 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Ecouri Urbane – Concert</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Rajdhani:wght@400;600;700&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --yellow: #D4A017;
+      --coral: #C0392B;
+      --purple: #5B2D8E;
+      --neon-yellow: #FFD700;
+      --neon-coral: #FF4040;
+      --neon-purple: #8A2BE2;
+      --bg: #050505;
+      --text: #F0E8D0;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Rajdhani', sans-serif;
+      overflow-x: hidden;
+      cursor: none;
+    }
+
+    /* Custom cursor */
+    .cursor {
+      width: 14px; height: 14px;
+      border-radius: 50%;
+      background: var(--neon-yellow);
+      position: fixed; top: 0; left: 0;
+      pointer-events: none;
+      z-index: 9999;
+      transform: translate(-50%, -50%);
+      transition: transform 0.08s ease, background 0.2s;
+      box-shadow: 0 0 12px var(--neon-yellow), 0 0 30px var(--neon-yellow);
+      mix-blend-mode: screen;
+    }
+
+    /* Noise overlay */
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+      pointer-events: none; z-index: 1000; opacity: 0.4;
+    }
+
+    /* ─── NAVBAR ─── */
+    nav {
+      position: fixed; top: 0; width: 100%; z-index: 500;
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 18px 5vw;
+      background: linear-gradient(to bottom, rgba(5,5,5,0.95), transparent);
+      backdrop-filter: blur(4px);
+    }
+
+    .nav-logo {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.8rem;
+      letter-spacing: 3px;
+      color: var(--neon-yellow);
+      text-shadow: 0 0 12px var(--neon-yellow), 0 0 40px #D4A01788;
+    }
+
+    nav ul {
+      display: flex; gap: 32px; list-style: none;
+    }
+
+    nav ul a {
+      font-size: 0.95rem; font-weight: 600; letter-spacing: 2px;
+      text-decoration: none; color: var(--text);
+      text-transform: uppercase;
+      transition: color 0.2s, text-shadow 0.2s;
+    }
+
+    nav ul a:hover {
+      color: var(--neon-coral);
+      text-shadow: 0 0 10px var(--neon-coral);
+    }
+
+    /* ─── HERO ─── */
+    #hero {
+      min-height: 100vh;
+      display: flex; flex-direction: column;
+      justify-content: center; align-items: center;
+      text-align: center;
+      position: relative;
+      padding: 120px 5vw 80px;
+      overflow: hidden;
+    }
+
+    .hero-bg {
+      position: absolute; inset: 0;
+      background:
+        radial-gradient(ellipse 60% 50% at 50% 30%, rgba(192,57,43,0.18) 0%, transparent 70%),
+        radial-gradient(ellipse 50% 60% at 70% 80%, rgba(91,45,142,0.25) 0%, transparent 65%),
+        radial-gradient(ellipse 40% 40% at 20% 60%, rgba(212,160,23,0.12) 0%, transparent 60%),
+        #050505;
+    }
+
+    /* Vinyl record background */
+    .vinyl {
+      position: absolute;
+      width: 520px; height: 520px;
+      border-radius: 50%;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -52%);
+      background: repeating-radial-gradient(
+        circle,
+        #111 0px, #111 2px,
+        #1a1a1a 2px, #1a1a1a 6px
+      );
+      opacity: 0.35;
+      animation: spinVinyl 18s linear infinite;
+    }
+
+    .vinyl::after {
+      content: '';
+      position: absolute; top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      width: 80px; height: 80px;
+      border-radius: 50%;
+      background: radial-gradient(circle, #D4A017 0%, #8A2BE2 100%);
+      opacity: 0.7;
+      box-shadow: 0 0 30px var(--neon-yellow);
+    }
+
+    @keyframes spinVinyl {
+      from { transform: translate(-50%, -52%) rotate(0deg); }
+      to   { transform: translate(-50%, -52%) rotate(360deg); }
+    }
+
+    /* Scanlines */
+    #hero::after {
+      content: '';
+      position: absolute; inset: 0;
+      background: repeating-linear-gradient(
+        0deg,
+        transparent, transparent 3px,
+        rgba(0,0,0,0.08) 3px, rgba(0,0,0,0.08) 4px
+      );
+      pointer-events: none;
+    }
+
+    .hero-tag {
+      font-size: 0.8rem; font-weight: 700; letter-spacing: 5px;
+      text-transform: uppercase;
+      color: var(--neon-purple);
+      text-shadow: 0 0 10px var(--neon-purple);
+      margin-bottom: 18px;
+      position: relative; z-index: 2;
+      animation: fadeUp 0.8s ease both;
+    }
+
+    .hero-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(4.5rem, 13vw, 11rem);
+      line-height: 0.9;
+      letter-spacing: 4px;
+      position: relative; z-index: 2;
+      animation: fadeUp 0.9s 0.1s ease both;
+    }
+
+    .hero-title .line1 {
+      display: block;
+      color: var(--neon-yellow);
+      text-shadow:
+        0 0 20px var(--neon-yellow),
+        0 0 60px #D4A01766,
+        0 0 120px #D4A01733;
+    }
+
+    .hero-title .line2 {
+      display: block;
+      color: var(--neon-coral);
+      text-shadow:
+        0 0 20px var(--neon-coral),
+        0 0 60px #FF404066,
+        0 0 120px #FF404033;
+    }
+
+    .hero-sub {
+      font-size: 1.05rem; font-weight: 600; letter-spacing: 3px;
+      text-transform: uppercase; margin-top: 20px;
+      color: rgba(240,232,208,0.7);
+      position: relative; z-index: 2;
+      animation: fadeUp 1s 0.3s ease both;
+    }
+
+    .hero-cta {
+      margin-top: 44px;
+      position: relative; z-index: 2;
+      display: flex; gap: 18px; flex-wrap: wrap; justify-content: center;
+      animation: fadeUp 1s 0.45s ease both;
+    }
+
+    .btn {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.1rem; letter-spacing: 3px;
+      padding: 14px 38px;
+      border: 2px solid;
+      text-decoration: none;
+      text-transform: uppercase;
+      transition: all 0.25s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn::before {
+      content: '';
+      position: absolute; inset: 0;
+      transform: translateX(-105%);
+      transition: transform 0.3s ease;
+    }
+
+    .btn:hover::before { transform: translateX(0); }
+
+    .btn-primary {
+      background: var(--neon-yellow);
+      border-color: var(--neon-yellow);
+      color: #050505;
+      box-shadow: 0 0 20px var(--neon-yellow)88, 0 0 50px var(--neon-yellow)44;
+    }
+
+    .btn-primary::before { background: rgba(255,255,255,0.15); }
+    .btn-primary:hover {
+      box-shadow: 0 0 35px var(--neon-yellow), 0 0 80px var(--neon-yellow)66;
+      transform: translateY(-2px);
+    }
+
+    .btn-secondary {
+      background: transparent;
+      border-color: var(--neon-coral);
+      color: var(--neon-coral);
+      box-shadow: 0 0 15px var(--neon-coral)44;
+    }
+
+    .btn-secondary::before { background: var(--neon-coral)18; }
+    .btn-secondary:hover {
+      color: #fff;
+      box-shadow: 0 0 25px var(--neon-coral)88;
+      transform: translateY(-2px);
+    }
+
+    /* ─── EQUALIZER BARS ─── */
+    .eq-bars {
+      position: absolute; bottom: 0; left: 0; right: 0;
+      display: flex; align-items: flex-end; justify-content: center;
+      gap: 4px; height: 80px; z-index: 2;
+      opacity: 0.6;
+    }
+
+    .eq-bar {
+      width: 6px; border-radius: 3px 3px 0 0;
+      animation: eqPulse var(--dur) ease-in-out infinite alternate;
+    }
+
+    @keyframes eqPulse {
+      from { height: var(--min); }
+      to   { height: var(--max); }
+    }
+
+    /* ─── SECTION BASE ─── */
+    section {
+      padding: 100px 5vw;
+      position: relative;
+    }
+
+    .section-label {
+      font-size: 0.75rem; font-weight: 700; letter-spacing: 5px;
+      text-transform: uppercase; margin-bottom: 14px;
+    }
+
+    .section-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(2.5rem, 6vw, 4.5rem);
+      letter-spacing: 3px;
+      line-height: 1;
+    }
+
+    /* ─── ABOUT ─── */
+    #despre {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 60px; align-items: center;
+      max-width: 1100px; margin: 0 auto;
+    }
+
+    #despre .section-label { color: var(--neon-purple); text-shadow: 0 0 8px var(--neon-purple); }
+    #despre .section-title { color: var(--neon-yellow); text-shadow: 0 0 20px var(--neon-yellow)88; }
+
+    .despre-text {
+      font-size: 1.1rem; line-height: 1.8;
+      color: rgba(240,232,208,0.85);
+      margin-top: 22px;
+    }
+
+    .despre-text strong {
+      color: var(--neon-coral);
+      text-shadow: 0 0 8px var(--neon-coral)66;
+    }
+
+    .despre-card {
+      background: linear-gradient(135deg, rgba(91,45,142,0.2), rgba(192,57,43,0.15));
+      border: 1px solid rgba(212,160,23,0.25);
+      padding: 40px;
+      border-radius: 2px;
+      position: relative;
+      box-shadow: inset 0 0 40px rgba(212,160,23,0.05), 0 0 30px rgba(212,160,23,0.08);
+    }
+
+    .despre-card::before {
+      content: '♪';
+      font-size: 8rem;
+      position: absolute; top: 10px; right: 20px;
+      opacity: 0.06; line-height: 1;
+    }
+
+    .card-stat {
+      margin-bottom: 28px;
+    }
+
+    .card-stat-num {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 3rem; letter-spacing: 2px;
+      color: var(--neon-yellow);
+      text-shadow: 0 0 15px var(--neon-yellow)88;
+      line-height: 1;
+    }
+
+    .card-stat-label {
+      font-size: 0.85rem; font-weight: 700; letter-spacing: 3px;
+      text-transform: uppercase;
+      color: rgba(240,232,208,0.5);
+      margin-top: 4px;
+    }
+
+    /* ─── LINEUP ─── */
+    #lineup {
+      background: linear-gradient(180deg, #050505 0%, #0d060f 50%, #050505 100%);
+      text-align: center;
+    }
+
+    #lineup .section-label { color: var(--neon-coral); text-shadow: 0 0 8px var(--neon-coral); text-align: center; }
+    #lineup .section-title { color: var(--text); text-align: center; margin-bottom: 60px; }
+
+    .lineup-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      gap: 24px; max-width: 960px; margin: 0 auto;
+    }
+
+    .artist-card {
+      border: 1px solid rgba(138,43,226,0.3);
+      padding: 36px 20px;
+      position: relative; overflow: hidden;
+      transition: border-color 0.3s, transform 0.3s;
+      background: rgba(255,255,255,0.02);
+    }
+
+    .artist-card:hover {
+      border-color: var(--neon-purple);
+      transform: translateY(-6px);
+      box-shadow: 0 0 30px rgba(138,43,226,0.2);
+    }
+
+    .artist-icon {
+      font-size: 2.5rem; margin-bottom: 16px; display: block;
+    }
+
+    .artist-name {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.6rem; letter-spacing: 2px;
+      color: var(--neon-yellow);
+      text-shadow: 0 0 10px var(--neon-yellow)88;
+    }
+
+    .artist-type {
+      font-size: 0.8rem; font-weight: 600; letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--neon-coral); margin-top: 6px;
+      text-shadow: 0 0 6px var(--neon-coral)66;
+    }
+
+    .artist-tba {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.2rem; letter-spacing: 3px;
+      color: rgba(240,232,208,0.2);
+    }
+
+    /* ─── VENUE ─── */
+    #locatie {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 60px; align-items: center;
+      max-width: 1100px; margin: 0 auto;
+    }
+
+    #locatie .section-label { color: var(--neon-yellow); text-shadow: 0 0 8px var(--neon-yellow); }
+    #locatie .section-title { color: var(--neon-coral); text-shadow: 0 0 20px var(--neon-coral)66; }
+
+    .venue-info { margin-top: 28px; }
+
+    .venue-row {
+      display: flex; align-items: flex-start; gap: 16px;
+      margin-bottom: 22px; padding-bottom: 22px;
+      border-bottom: 1px solid rgba(212,160,23,0.12);
+    }
+
+    .venue-row:last-child { border-bottom: none; }
+
+    .venue-icon {
+      font-size: 1.4rem; margin-top: 2px; flex-shrink: 0;
+    }
+
+    .venue-key {
+      font-size: 0.75rem; font-weight: 700; letter-spacing: 3px;
+      text-transform: uppercase; color: rgba(240,232,208,0.4);
+      margin-bottom: 4px;
+    }
+
+    .venue-val {
+      font-size: 1.1rem; font-weight: 600;
+      color: var(--text);
+    }
+
+    .map-placeholder {
+      height: 320px;
+      background: linear-gradient(135deg, rgba(91,45,142,0.25), rgba(192,57,43,0.2));
+      border: 1px solid rgba(212,160,23,0.2);
+      display: flex; flex-direction: column;
+      justify-content: center; align-items: center;
+      gap: 12px;
+      border-radius: 2px;
+      position: relative; overflow: hidden;
+    }
+
+    .map-placeholder::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: repeating-linear-gradient(
+        45deg,
+        transparent, transparent 20px,
+        rgba(212,160,23,0.03) 20px, rgba(212,160,23,0.03) 21px
+      );
+    }
+
+    .map-pin {
+      font-size: 3rem;
+      animation: bounce 2s ease-in-out infinite;
+    }
+
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+
+    .map-label {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.4rem; letter-spacing: 3px;
+      color: var(--neon-yellow);
+      text-shadow: 0 0 12px var(--neon-yellow)88;
+    }
+
+    /* ─── CAUZA ─── */
+    #cauza {
+      text-align: center;
+      background: radial-gradient(ellipse 80% 60% at 50% 50%, rgba(138,43,226,0.12) 0%, transparent 70%);
+    }
+
+    #cauza .section-label { color: var(--neon-yellow); text-shadow: 0 0 8px var(--neon-yellow); }
+    #cauza .section-title {
+      color: var(--text); max-width: 800px; margin: 0 auto 30px;
+    }
+
+    .cauza-text {
+      font-size: 1.15rem; line-height: 1.9; max-width: 680px;
+      margin: 0 auto 50px;
+      color: rgba(240,232,208,0.8);
+    }
+
+    .cauza-text strong {
+      color: var(--neon-coral);
+      text-shadow: 0 0 8px var(--neon-coral)66;
+    }
+
+    .progress-wrap {
+      max-width: 600px; margin: 0 auto 50px;
+    }
+
+    .progress-labels {
+      display: flex; justify-content: space-between;
+      margin-bottom: 10px;
+      font-size: 0.85rem; font-weight: 700; letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+
+    .progress-labels span:first-child { color: var(--neon-yellow); }
+    .progress-labels span:last-child { color: rgba(240,232,208,0.4); }
+
+    .progress-bar {
+      height: 8px; background: rgba(255,255,255,0.08);
+      border-radius: 4px; overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%; width: 0%;
+      background: linear-gradient(90deg, var(--neon-purple), var(--neon-coral), var(--neon-yellow));
+      border-radius: 4px;
+      box-shadow: 0 0 12px var(--neon-yellow)66;
+      transition: width 2s ease;
+    }
+
+    /* ─── CONTACT ─── */
+    #contact {
+      text-align: center; max-width: 700px; margin: 0 auto;
+    }
+
+    #contact .section-label { color: var(--neon-purple); text-shadow: 0 0 8px var(--neon-purple); }
+    #contact .section-title { color: var(--neon-yellow); text-shadow: 0 0 20px var(--neon-yellow)88; margin-bottom: 20px; }
+
+    .contact-sub {
+      font-size: 1.05rem; line-height: 1.8;
+      color: rgba(240,232,208,0.7); margin-bottom: 40px;
+    }
+
+    .contact-links {
+      display: flex; gap: 20px; justify-content: center; flex-wrap: wrap;
+    }
+
+    /* ─── FOOTER ─── */
+    footer {
+      text-align: center; padding: 40px 5vw;
+      border-top: 1px solid rgba(212,160,23,0.1);
+      font-size: 0.85rem; font-weight: 600; letter-spacing: 2px;
+      color: rgba(240,232,208,0.3);
+      text-transform: uppercase;
+    }
+
+    footer span {
+      color: var(--neon-coral);
+      text-shadow: 0 0 6px var(--neon-coral)66;
+    }
+
+    /* ─── DIVIDER ─── */
+    .divider {
+      width: 60px; height: 3px;
+      background: linear-gradient(90deg, var(--neon-coral), var(--neon-purple));
+      margin: 16px 0 0;
+      box-shadow: 0 0 10px var(--neon-coral)66;
+    }
+
+    /* ─── ANIMATIONS ─── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .reveal {
+      opacity: 0; transform: translateY(40px);
+      transition: opacity 0.7s ease, transform 0.7s ease;
+    }
+
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+
+    /* ─── RESPONSIVE ─── */
+    @media (max-width: 768px) {
+      #despre, #locatie { grid-template-columns: 1fr; }
+      .lineup-grid { grid-template-columns: 1fr 1fr; }
+      nav ul { display: none; }
+      .hero-title { font-size: clamp(3.5rem, 18vw, 6rem); }
+    }
+
+    @media (max-width: 480px) {
+      .lineup-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="cursor" id="cursor"></div>
+
+<!-- NAVBAR -->
+<nav>
+  <div class="nav-logo">Ecouri Urbane</div>
+  <ul>
+    <li><a href="#despre">Despre</a></li>
+    <li><a href="#lineup">Lineup</a></li>
+    <li><a href="#locatie">Locație</a></li>
+    <li><a href="#cauza">Cauza</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-bg"></div>
+  <div class="vinyl"></div>
+
+  <p class="hero-tag">Concert de Muzică Live · Galați</p>
+  <h1 class="hero-title">
+    <span class="line1">Ecouri</span>
+    <span class="line2">Urbane</span>
+  </h1>
+  <p class="hero-sub">Sala Sporturilor Galați &nbsp;·&nbsp; 2025</p>
+
+  <div class="hero-cta">
+    <a href="#cauza" class="btn btn-primary">Susține Cauza</a>
+    <a href="#lineup" class="btn btn-secondary">Vezi Lineup</a>
+  </div>
+
+  <!-- EQ bars -->
+  <div class="eq-bars" id="eqBars"></div>
+</section>
+
+<!-- DESPRE -->
+<section>
+  <div id="despre" class="reveal">
+    <div>
+      <p class="section-label">Despre Concert</p>
+      <h2 class="section-title">Un sunet.<br>Un scop.</h2>
+      <div class="divider"></div>
+      <p class="despre-text">
+        <strong>Ecouri Urbane</strong> este mai mult decât un concert – este vocea unei generații care vrea să fie auzită.
+        Un eveniment de muzică live care adună artiști, pasionați și comunitate sub același acoperiș,
+        pentru o cauză care contează cu adevărat.
+      </p>
+      <p class="despre-text" style="margin-top:14px;">
+        Fiecare bilet vândut, fiecare aplaudat, fiecare ecou din sală merge direct spre
+        <strong>construirea radioului liceului CNCN</strong> – un spațiu al expresiei tinere.
+      </p>
+    </div>
+    <div class="despre-card">
+      <div class="card-stat">
+        <div class="card-stat-num">Sala<br>Sporturilor</div>
+        <div class="card-stat-label">Locație – Galați</div>
+      </div>
+      <div class="card-stat">
+        <div class="card-stat-num" style="color:var(--neon-coral);text-shadow:0 0 15px var(--neon-coral)88;">LIVE</div>
+        <div class="card-stat-label">Muzică · Energie · Comunitate</div>
+      </div>
+      <div class="card-stat" style="margin-bottom:0;">
+        <div class="card-stat-num" style="color:var(--neon-purple);text-shadow:0 0 15px var(--neon-purple)88;">Radio</div>
+        <div class="card-stat-label">Scopul Nostru – CNCN</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- LINEUP -->
+<section id="lineup">
+  <p class="section-label">Artiști</p>
+  <h2 class="section-title">Lineup</h2>
+
+  <div class="lineup-grid reveal">
+    <div class="artist-card">
+      <span class="artist-icon">🎤</span>
+      <div class="artist-name">TBA</div>
+      <div class="artist-type">Headliner</div>
+    </div>
+    <div class="artist-card">
+      <span class="artist-icon">🎸</span>
+      <div class="artist-name">TBA</div>
+      <div class="artist-type">Trupă Live</div>
+    </div>
+    <div class="artist-card">
+      <span class="artist-icon">🎹</span>
+      <div class="artist-name">TBA</div>
+      <div class="artist-type">Special Guest</div>
+    </div>
+    <div class="artist-card">
+      <span class="artist-icon">🎧</span>
+      <div class="artist-name">TBA</div>
+      <div class="artist-type">DJ Set</div>
+    </div>
+    <div class="artist-card">
+      <span class="artist-icon">🎙️</span>
+      <div class="artist-name">TBA</div>
+      <div class="artist-type">MC / Host</div>
+    </div>
+    <div class="artist-card" style="border-color:rgba(212,160,23,0.15); display:flex; flex-direction:column; justify-content:center;">
+      <div class="artist-tba">Mai sunt<br>surprize...</div>
+    </div>
+  </div>
+</section>
+
+<!-- LOCATIE -->
+<section>
+  <div id="locatie" class="reveal">
+    <div>
+      <p class="section-label">Unde Ne Găsești</p>
+      <h2 class="section-title">Sala Sporturilor<br>Galați</h2>
+      <div class="divider" style="background:linear-gradient(90deg,var(--neon-yellow),var(--neon-coral));"></div>
+
+      <div class="venue-info">
+        <div class="venue-row">
+          <span class="venue-icon">📍</span>
+          <div>
+            <div class="venue-key">Adresă</div>
+            <div class="venue-val">Sala Sporturilor, Galați</div>
+          </div>
+        </div>
+        <div class="venue-row">
+          <span class="venue-icon">📅</span>
+          <div>
+            <div class="venue-key">Dată</div>
+            <div class="venue-val">TBA – 2025</div>
+          </div>
+        </div>
+        <div class="venue-row">
+          <span class="venue-icon">🕗</span>
+          <div>
+            <div class="venue-key">Ora</div>
+            <div class="venue-val">TBA</div>
+          </div>
+        </div>
+        <div class="venue-row">
+          <span class="venue-icon">🎟️</span>
+          <div>
+            <div class="venue-key">Bilete</div>
+            <div class="venue-val">În curând disponibile</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="map-placeholder">
+      <span class="map-pin">📍</span>
+      <span class="map-label">Galați, România</span>
+      <span style="font-size:0.8rem;letter-spacing:2px;text-transform:uppercase;color:rgba(240,232,208,0.3);">Harta în curând</span>
+    </div>
+  </div>
+</section>
+
+<!-- CAUZA -->
+<section id="cauza">
+  <p class="section-label">De Ce Contează</p>
+  <h2 class="section-title reveal">Construim Radioul<br>Liceului CNCN</h2>
+
+  <p class="cauza-text reveal">
+    Toți banii strânși din bilete merg direct spre înființarea unui <strong>post de radio al liceului CNCN din Galați</strong>.
+    Un studio real, microfoane reale, voci reale – ale voastre. Ajutați-ne să dăm o voce generației următoare.
+  </p>
+
+  <div class="progress-wrap reveal">
+    <div class="progress-labels">
+      <span>Progres Strângere Fonduri</span>
+      <span>Obiectiv: TBA</span>
+    </div>
+    <div class="progress-bar">
+      <div class="progress-fill" id="progressFill"></div>
+    </div>
+  </div>
+
+  <div class="reveal">
+    <a href="#contact" class="btn btn-primary">Vreau să Ajut</a>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section>
+  <div id="contact" class="reveal">
+    <p class="section-label">Rămâi Conectat</p>
+    <h2 class="section-title">Contact &<br>Informații</h2>
+    <div class="divider" style="margin:16px auto 0; background:linear-gradient(90deg,var(--neon-purple),var(--neon-yellow));"></div>
+    <p class="contact-sub" style="margin-top:24px;">
+      Pentru parteneri, artiști sau orice întrebare legată de eveniment,<br>
+      ne poți contacta direct. Detalii complete vor fi adăugate în curând.
+    </p>
+
+    <div class="contact-links">
+      <a href="#" class="btn btn-primary">Instagram</a>
+      <a href="#" class="btn btn-secondary">Email</a>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <p>© 2025 <span>Ecouri Urbane</span> · Galați · Toate drepturile rezervate</p>
+  <p style="margin-top:8px; font-size:0.75rem;">Susținem <span>Radioul CNCN</span> – vocea generației tale</p>
+</footer>
+
+<script>
+  // Custom cursor
+  const cursor = document.getElementById('cursor');
+  document.addEventListener('mousemove', e => {
+    cursor.style.left = e.clientX + 'px';
+    cursor.style.top  = e.clientY + 'px';
+  });
+
+  // EQ bars
+  const eqContainer = document.getElementById('eqBars');
+  const colors = ['#D4A017','#C0392B','#8A2BE2','#FF4040','#FFD700','#5B2D8E'];
+  for (let i = 0; i < 48; i++) {
+    const bar = document.createElement('div');
+    bar.className = 'eq-bar';
+    const min = Math.floor(Math.random() * 15 + 5);
+    const max = Math.floor(Math.random() * 55 + 20);
+    const dur = (Math.random() * 0.6 + 0.3).toFixed(2) + 's';
+    bar.style.cssText = `--min:${min}px;--max:${max}px;--dur:${dur};
+      height:${min}px;
+      background:${colors[i % colors.length]};
+      box-shadow:0 0 6px ${colors[i % colors.length]}88;
+      animation-delay:${(Math.random()*0.5).toFixed(2)}s`;
+    eqContainer.appendChild(bar);
+  }
+
+  // Scroll reveal
+  const reveals = document.querySelectorAll('.reveal');
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('visible');
+        // Progress bar trigger
+        if (e.target.querySelector('#progressFill')) {
+          setTimeout(() => {
+            document.getElementById('progressFill').style.width = '35%';
+          }, 300);
+        }
+      }
+    });
+  }, { threshold: 0.15 });
+
+  reveals.forEach(el => observer.observe(el));
+</script>
+</body>
+</html>
